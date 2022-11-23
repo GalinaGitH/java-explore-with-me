@@ -13,7 +13,7 @@ public interface EventService {
      * PRIVATE:
      * добавление нового события
      */
-    EventFullDto saveEvent(NewEventDto newEventDto);
+    EventFullDto saveEvent(long userId, NewEventDto newEventDto);
 
     /**
      * изменение события, добавленного пользователем
@@ -33,7 +33,7 @@ public interface EventService {
     /**
      * отмена события, добавленного текущим пользователем
      */
-    void deleteEventById(long userId, long eventId);
+    EventFullDto deleteEventById(long userId, long eventId);
 
 
     /**
@@ -57,7 +57,7 @@ public interface EventService {
      * поиск событий
      */
 
-    List<EventShortDto> getEvents(List<Long> users, List<EventState> states,
+    List<EventFullDto> getEvents(List<Long> users, List<EventState> states,
                                   List<Long> categories, LocalDateTime rangeStart,
                                   LocalDateTime rangeEnd, int from, int size);
 

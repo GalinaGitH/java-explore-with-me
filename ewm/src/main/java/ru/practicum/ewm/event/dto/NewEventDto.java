@@ -1,49 +1,54 @@
 package ru.practicum.ewm.event.dto;
 
-import ru.practicum.ewm.category.EventCategory;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
 import ru.practicum.ewm.event.Location;
+import ru.practicum.ewm.user.Create;
 import ru.practicum.ewm.user.Update;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode(of = "eventId")
 public class NewEventDto {
 
-    @NotBlank(groups = {Update.class})
-    private Long id;
+    @Positive(groups = {Update.class})
+    private Long eventId;
 
-    @NotBlank(groups = {Update.class})
+    @NotNull(groups = {Update.class, Create.class})
     @Size(min = 3, max = 120)
     private String title;
 
-    @NotBlank(groups = {Update.class})
+    @NotNull(groups = {Update.class, Create.class})
     @Size(min = 20, max = 7000)
     private String description;
 
-    @NotBlank(groups = {Update.class})
+    @NotNull(groups = {Update.class, Create.class})
     @Size(min = 20, max = 2000)
     private String annotation;
 
-    @NotBlank(groups = {Update.class})
-    @Positive
-    private EventCategory category;
+    @Positive(groups = {Update.class, Create.class})
+    private Long category;
 
-    @NotBlank(groups = {Update.class})
-    @Future
+    @Future(groups = {Update.class, Create.class})
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
-    @NotNull
+    @NotNull(groups = {Create.class})
     private Location location;
 
-    @NotBlank(groups = {Update.class})
-    @NotNull
+    @NotNull(groups = {Update.class, Create.class})
     private Boolean paid;
 
-    @NotBlank(groups = {Update.class})
-    @PositiveOrZero
+    @PositiveOrZero(groups = {Update.class, Create.class})
     private Integer participantLimit;
 
-    @NotNull
-    private boolean requestModeration;
+    @NotNull(groups = {Create.class})
+    private Boolean requestModeration;
 
 }

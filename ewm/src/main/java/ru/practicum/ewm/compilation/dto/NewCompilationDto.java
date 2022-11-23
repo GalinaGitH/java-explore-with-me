@@ -1,10 +1,9 @@
 package ru.practicum.ewm.compilation.dto;
 
 import lombok.*;
-import ru.practicum.ewm.event.dto.EventShortDto;
 
 import javax.validation.constraints.NotBlank;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -12,12 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
-public class CompilationDto {
-
-    private long id;
+public class NewCompilationDto {
+    @NotBlank
     private String title;
     private boolean pinned;
-    @NotBlank
-    private List<EventShortDto> events;
-
+    private Set<Long> events;
 }

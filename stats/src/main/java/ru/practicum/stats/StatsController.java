@@ -19,14 +19,14 @@ public class StatsController {
     private final StatsService statsService;
 
     @PostMapping("/hit")
-    public EndpointHitDto hit(@RequestBody @Valid EndpointHitDto endpointHitDto) {
+    public void hit(@RequestBody @Valid EndpointHitDto endpointHitDto) {
         log.info("Add info about request");
-        return statsService.addHit(endpointHitDto);
+        statsService.addHit(endpointHitDto);
     }
 
     @GetMapping("/stats")
-    public List<ViewStats> getStats(@RequestParam(name = "start") long start,
-                                    @RequestParam(name = "end") long end,
+    public List<ViewStats> getStats(@RequestParam(name = "start") String start,
+                                    @RequestParam(name = "end") String end,
                                     @RequestParam(name = "uris", required = false) List<String> uris,
                                     @RequestParam(name = "unique", defaultValue = "false") boolean unique) {
         log.info("Getting statistics on visits");

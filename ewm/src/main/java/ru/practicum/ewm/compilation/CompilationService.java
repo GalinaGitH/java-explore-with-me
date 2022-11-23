@@ -1,6 +1,7 @@
 package ru.practicum.ewm.compilation;
 
 import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.dto.NewCompilationDto;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface CompilationService {
      * ADMIN:
      * добавление новой подборки
      */
-    CompilationDto addCompilation(CompilationDto compilationDto);
+    CompilationDto addCompilation(NewCompilationDto newCompilationDto);
 
     /**
      * ADMIN:

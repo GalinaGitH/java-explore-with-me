@@ -14,10 +14,13 @@ public class CompilationMapper {
 
     public CompilationDto toDto(Compilation compilation) {
         return new CompilationDto(
+                compilation.getId(),
                 compilation.getTitle(),
                 compilation.isPinned(),
                 compilation.getEvents().stream().map(eventMapper::toShortDto)
                         .collect(Collectors.toList())
         );
     }
+
 }
+

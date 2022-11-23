@@ -1,9 +1,8 @@
 package ru.practicum.ewm.request.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.request.ParticipationStatus;
-import ru.practicum.ewm.user.User;
 
 import java.time.LocalDateTime;
 
@@ -15,9 +14,11 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(of = "id")
 public class ParticipationRequestDto {
 
-    private Long id;
-    private Event event;
-    private User requester;
+    private long id;
+    private long event;
+    private long requester;
     private ParticipationStatus status;
-    private LocalDateTime createdOn;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime created;
 }

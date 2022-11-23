@@ -8,6 +8,7 @@ import ru.practicum.ewm.event.EventService;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
+import ru.practicum.ewm.user.Create;
 import ru.practicum.ewm.user.Update;
 
 import javax.validation.Valid;
@@ -30,16 +31,18 @@ public class UserController {
     }
 
     @PatchMapping("/events")
+    @Validated({Update.class})
     public EventFullDto updateEvent(@PathVariable("id") long userId,
-                                    @RequestBody @Valid @Validated({Update.class}) NewEventDto newEventDto) {
+                                    @RequestBody @Valid  NewEventDto newEventDto) {
         EventFullDto eventDtoUpdated = eventService.updateEvent(userId, newEventDto);
         log.debug("Event updated");
         return eventDtoUpdated;
     }
 
     @PostMapping("/events")
+    @Validated({Create.class})
     public EventFullDto createEvent(@PathVariable("id") long userId, @RequestBody @Valid NewEventDto newEventDto) {
-        EventFullDto eventDtoSaved = eventService.saveEvent(newEventDto);
+        EventFullDto eventDtoSaved = eventService.saveEvent(userId, newEventDto);
         log.debug("Number of added events: {}", 1);
         return eventDtoSaved;
     }
@@ -52,9 +55,10 @@ public class UserController {
     }
 
     @PatchMapping("/events/{eventId}")
-    public void deleteEvent(@PathVariable("id") long userId, @PathVariable("eventId") long eventId) {
-        eventService.deleteEventById(userId, eventId);
+    public EventFullDto deleteEvent(@PathVariable("id") long userId, @PathVariable("eventId") long eventId) {
+        EventFullDto eventFullDto = eventService.deleteEventById(userId, eventId);
         log.debug("User's event with userid= {} , eventId={} - canceled", userId, eventId);
+        return eventFullDto;
     }
 
 }

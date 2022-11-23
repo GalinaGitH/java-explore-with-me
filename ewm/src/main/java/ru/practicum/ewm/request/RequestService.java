@@ -30,7 +30,7 @@ public interface RequestService {
     /**
      * добавление запроса текущего пользователя на участие в событии
      */
-    ParticipationRequestDto addRequests(long userId, long eventId);
+    ParticipationRequestDto addRequest(long userId, long eventId);
 
     /**
      * отмена своего запроса на участие в событии

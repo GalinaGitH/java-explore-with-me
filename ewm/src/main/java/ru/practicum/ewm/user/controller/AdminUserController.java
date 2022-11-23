@@ -3,9 +3,8 @@ package ru.practicum.ewm.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.user.Create;
+
 import ru.practicum.ewm.user.UserService;
 import ru.practicum.ewm.user.dto.UserDto;
 
@@ -13,7 +12,6 @@ import javax.validation.Valid;
 import java.util.List;
 
 
-@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/admin/users")
@@ -31,7 +29,7 @@ public class AdminUserController {
 
 
     @PostMapping
-    public UserDto registerUser(@RequestBody @Valid @Validated({Create.class})UserDto userDto) {
+    public UserDto registerUser(@RequestBody @Valid UserDto userDto) {
         UserDto userDtoSaved = userService.saveUser(userDto);
         log.debug("Number of added users: {}", 1);
         return userDtoSaved;

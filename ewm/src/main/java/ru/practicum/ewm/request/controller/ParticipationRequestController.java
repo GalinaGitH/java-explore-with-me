@@ -49,7 +49,7 @@ public class ParticipationRequestController {
     public ParticipationRequestDto addRequests(@PathVariable("id") long userId,
                                                @RequestParam("eventId") long eventId) {
         log.info("Add user's requests to participate in  event(eventId={}) by userId={} ", eventId, userId);
-        return requestService.addRequests(userId, eventId);
+        return requestService.addRequest(userId, eventId);
     }
 
     @PatchMapping("/requests/{requestId}/cancel")

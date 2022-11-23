@@ -1,9 +1,9 @@
 package ru.practicum.ewm.event.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.EventService;
 import ru.practicum.ewm.event.EventsSort;
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Validated
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/events")
@@ -25,6 +25,7 @@ public class EventController {
     private final EventService eventService;
     private final StatisticsClient statisticsClient;
 
+    @SneakyThrows
     @GetMapping
     public List<EventShortDto> getAllEvents(@RequestParam(name = "text", required = false) String text,
                                             @RequestParam(name = "categories", required = false) List<Long> categories,
@@ -38,16 +39,18 @@ public class EventController {
                                             @RequestParam(name = "from", defaultValue = "0") int from,
                                             @RequestParam(name = "size", defaultValue = "10") int size,
                                             HttpServletRequest request) {
-        statisticsClient.saveEndpointHit(request.getRequestURI(), request.getRemoteAddr());
+        statisticsClient.saveEndpointHit(request);
         log.info("Get List of events with the possibility of filtering");
         return eventService.getAllEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort.name(), from, size);
     }
 
+
+    @SneakyThrows
     @GetMapping("/{id}")
     public EventFullDto getEventById(@PathVariable("id") long eventId, HttpServletRequest request) {
-        statisticsClient.saveEndpointHit(request.getRequestURI(), request.getRemoteAddr());
         log.info("Get full information about a published event  by eventId={}", eventId);
         EventFullDto eventFullDto = eventService.getEventById(eventId);
+        statisticsClient.saveEndpointHit(request);
         return eventFullDto;
     }
 }

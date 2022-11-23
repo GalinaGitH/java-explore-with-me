@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.compilation.CompilationService;
 import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.dto.NewCompilationDto;
 
 import javax.validation.Valid;
 
@@ -18,9 +19,9 @@ public class AdminCompilationController {
     private final CompilationService compilationService;
 
     @PostMapping
-    public CompilationDto addCompilation(@RequestBody @Valid CompilationDto compilationDto) {
+    public CompilationDto addCompilation(@RequestBody @Valid NewCompilationDto newCompilationDto) {
         log.info("Create new compilation by admin");
-        CompilationDto savedCompilationDto = compilationService.addCompilation(compilationDto);
+        CompilationDto savedCompilationDto = compilationService.addCompilation(newCompilationDto);
         return savedCompilationDto;
     }
 

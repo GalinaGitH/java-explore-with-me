@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.EventService;
 import ru.practicum.ewm.event.EventState;
 import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.user.Update;
 
@@ -25,15 +24,15 @@ public class AdminEventController {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventShortDto> findAllEvents(@RequestParam(name = "users", required = false) List<Long> users,
-                                             @RequestParam(name = "states", required = false) List<EventState> states,
-                                             @RequestParam(name = "categories", required = false) List<Long> categories,
-                                             @RequestParam(name = "rangeStart", required = false)
-                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-                                             @RequestParam(name = "rangeEnd", required = false)
-                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
-                                             @RequestParam(name = "from", defaultValue = "0") int from,
-                                             @RequestParam(name = "size", defaultValue = "10") int size) {
+    public List<EventFullDto> findAllEvents(@RequestParam(name = "users", required = false) List<Long> users,
+                                            @RequestParam(name = "states", required = false) List<EventState> states,
+                                            @RequestParam(name = "categories", required = false) List<Long> categories,
+                                            @RequestParam(name = "rangeStart", required = false)
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                            @RequestParam(name = "rangeEnd", required = false)
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                                            @RequestParam(name = "from", defaultValue = "0") int from,
+                                            @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Get List of events with the possibility of filtering");
         return eventService.getEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
