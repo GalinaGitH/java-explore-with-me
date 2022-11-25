@@ -26,16 +26,16 @@ public class UserController {
     public List<EventShortDto> findEvents(@PathVariable("id") long userId,
                                           @RequestParam(name = "from", defaultValue = "0") int from,
                                           @RequestParam(name = "size", defaultValue = "10") int size) {
-        log.debug("Total number of events: {}", eventService.getEventsOfUser(userId, from, size).size());
+        log.debug("Total number of events: {}. Method: GET/findEvents in UserController", eventService.getEventsOfUser(userId, from, size).size());
         return eventService.getEventsOfUser(userId, from, size);
     }
 
     @PatchMapping("/events")
     @Validated({Update.class})
     public EventFullDto updateEvent(@PathVariable("id") long userId,
-                                    @RequestBody @Valid  NewEventDto newEventDto) {
+                                    @RequestBody @Valid NewEventDto newEventDto) {
         EventFullDto eventDtoUpdated = eventService.updateEvent(userId, newEventDto);
-        log.debug("Event updated");
+        log.debug("Event updated, NewEventDto = {}. Method: PATCH/updateEvent in UserController", newEventDto);
         return eventDtoUpdated;
     }
 
@@ -43,13 +43,14 @@ public class UserController {
     @Validated({Create.class})
     public EventFullDto createEvent(@PathVariable("id") long userId, @RequestBody @Valid NewEventDto newEventDto) {
         EventFullDto eventDtoSaved = eventService.saveEvent(userId, newEventDto);
-        log.debug("Number of added events: {}", 1);
+        log.debug("Create new event NewEventDto = {}, Method: POST/createEvent in UserController", newEventDto);
         return eventDtoSaved;
     }
 
     @GetMapping("/events/{eventId}")
     public EventFullDto getEvent(@PathVariable("id") long userId, @PathVariable("eventId") long eventId) {
-        log.info("Get user's event by userId={}, eventId={}", userId, eventId);
+        log.info("Get user's event by userId = {}, eventId = {}. " +
+                "Method: GET/getEvent in UserController", userId, eventId);
         EventFullDto eventFullDto = eventService.getUserEvent(userId, eventId);
         return eventFullDto;
     }
@@ -57,7 +58,8 @@ public class UserController {
     @PatchMapping("/events/{eventId}")
     public EventFullDto deleteEvent(@PathVariable("id") long userId, @PathVariable("eventId") long eventId) {
         EventFullDto eventFullDto = eventService.deleteEventById(userId, eventId);
-        log.debug("User's event with userid= {} , eventId={} - canceled", userId, eventId);
+        log.debug("User's event with userid = {} , eventId = {} - canceled. " +
+                "Method: PATCH/deleteEvent in UserController", userId, eventId);
         return eventFullDto;
     }
 

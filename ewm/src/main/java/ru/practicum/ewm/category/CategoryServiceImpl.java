@@ -21,7 +21,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> getCategories(int from, int size) {
-        List<EventCategory> categories = (List<EventCategory>) categoryRepository.findAll();
+        List<EventCategory> categories = categoryRepository.findAll();
         return categories.stream()
                 .map(categoryMapper::toDto)
                 .collect(Collectors.toList());
@@ -29,7 +29,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategoryById(long catId) {
-        final EventCategory eventCategory = categoryRepository.findById(catId).orElseThrow(NotFoundException::new);
+        final EventCategory eventCategory = categoryRepository.findById(catId)
+                .orElseThrow(() -> new NotFoundException("Not found category with id = " + catId));
         return categoryMapper.toDto(eventCategory);
     }
 
@@ -40,7 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             EventCategory savedCategory = categoryRepository.save(eventCategory);
             return categoryMapper.toDto(savedCategory);
-        } catch (DataIntegrityViolationException ex) {
+        } catch (DataIntegrityViolationException | ConflictException ex) {
             throw new ConflictException(ex.getMessage());
         }
     }
@@ -48,7 +49,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto updateCategory(CategoryDto categoryDto) {
-        EventCategory categoryInStorage = categoryRepository.findById(categoryDto.getId()).orElseThrow(NotFoundException::new);
+        EventCategory categoryInStorage = categoryRepository.findById(categoryDto.getId())
+                .orElseThrow(() -> new NotFoundException("Not found category with id = " + categoryDto.getId()));
         if (categoryDto.getName() != null) {
             categoryInStorage.setName(categoryDto.getName());
         }
@@ -63,7 +65,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(long catId) {
-       EventCategory eventCategory = categoryRepository.findById(catId).orElseThrow(NotFoundException::new);
+        EventCategory eventCategory = categoryRepository.findById(catId)
+                .orElseThrow(() -> new NotFoundException("Not found category with id = " + catId));
         categoryRepository.delete(eventCategory);
     }
 }

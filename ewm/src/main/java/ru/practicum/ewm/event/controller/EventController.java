@@ -40,7 +40,8 @@ public class EventController {
                                             @RequestParam(name = "size", defaultValue = "10") int size,
                                             HttpServletRequest request) {
         statisticsClient.saveEndpointHit(request);
-        log.info("Get List of events with the possibility of filtering");
+        log.info("Get List of events with the possibility of filtering. " +
+                "Method: GET/getAllEvents in EventController");
         return eventService.getAllEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort.name(), from, size);
     }
 
@@ -48,7 +49,8 @@ public class EventController {
     @SneakyThrows
     @GetMapping("/{id}")
     public EventFullDto getEventById(@PathVariable("id") long eventId, HttpServletRequest request) {
-        log.info("Get full information about a published event  by eventId={}", eventId);
+        log.info("Get full information about a published event  by eventId = {} ." +
+                "Method: GET/getEventById in EventController", eventId);
         EventFullDto eventFullDto = eventService.getEventById(eventId);
         statisticsClient.saveEndpointHit(request);
         return eventFullDto;

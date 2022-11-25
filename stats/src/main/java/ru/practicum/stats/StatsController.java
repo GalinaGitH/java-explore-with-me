@@ -20,7 +20,7 @@ public class StatsController {
 
     @PostMapping("/hit")
     public void hit(@RequestBody @Valid EndpointHitDto endpointHitDto) {
-        log.info("Add info about request");
+        log.info("Add info about request. EndpointHitDto = {}", endpointHitDto);
         statsService.addHit(endpointHitDto);
     }
 

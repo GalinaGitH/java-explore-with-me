@@ -15,4 +15,7 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     @Query("SELECT p FROM ParticipationRequest p WHERE p.event.id IN ?2 AND p.requester.id<?1 ")
     Optional<Object> getRequestOfUserInEvent(long userId, Event event);
+
+    @Query("SELECT p FROM ParticipationRequest p WHERE p.event.id IN ?1 AND p.status='PENDING'")
+    List<ParticipationRequest> findAllPendingParticipationRequestsOfEvent(long eventId);
 }

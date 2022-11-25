@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto saveUser(UserDto userDto) {
         User user = userMapper.toUser(userDto);
-        if (userRepository.findByEmail(userDto.getEmail()) != null) {
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new EmailNotUniqueException("Already exist");
         }
         try {
@@ -37,7 +37,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto get(long userId) {
-        final User user = userRepository.findById(userId).orElseThrow(NotFoundException::new);
+        final User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Not found user with id = " + userId));
         return userMapper.toDto(user);
     }
 
@@ -46,14 +47,15 @@ public class UserServiceImpl implements UserService {
         int page = from / size;
         List<User> allUsers = userRepository.findAllUsersByIdIn(ids, PageRequest.of(page, size));
         return allUsers.stream()
-                .map((User user) -> userMapper.toDto(user))
+                .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public void deleteUserById(long userId) {
-        final User user = userRepository.findById(userId).orElseThrow(NotFoundException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Not found user with id = " + userId));
         userRepository.delete(user);
     }
 }

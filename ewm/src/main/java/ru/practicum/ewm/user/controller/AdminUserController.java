@@ -23,7 +23,7 @@ public class AdminUserController {
     public List<UserDto> findUsers(@RequestParam(name = "ids", required = false) List<Long> ids,
                                    @RequestParam(name = "from", defaultValue = "0") int from,
                                    @RequestParam(name = "size", defaultValue = "10") int size) {
-        log.debug("Total number of users: {}", userService.findUsers(ids, from, size).size());
+        log.debug("Total number of users: {}. Method: GET/findUsers in AdminUserController ", userService.findUsers(ids, from, size).size());
         return userService.findUsers(ids, from, size);
     }
 
@@ -31,7 +31,7 @@ public class AdminUserController {
     @PostMapping
     public UserDto registerUser(@RequestBody @Valid UserDto userDto) {
         UserDto userDtoSaved = userService.saveUser(userDto);
-        log.debug("Number of added users: {}", 1);
+        log.debug("Number of added users: {}. Method: POST/registerUser in AdminUserController ", 1);
         return userDtoSaved;
     }
 
@@ -39,7 +39,7 @@ public class AdminUserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable("id") long userId) {
         userService.deleteUserById(userId);
-        log.debug("User with id= {} deleted", userId);
+        log.debug("User with id= {} deleted. Method: DELETE/deleteUser in AdminUserController", userId);
     }
 
 

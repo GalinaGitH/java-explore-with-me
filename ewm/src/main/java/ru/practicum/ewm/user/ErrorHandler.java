@@ -18,9 +18,9 @@ import ru.practicum.ewm.user.exception.NotFoundException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import javax.xml.bind.ValidationException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 
 @RestControllerAdvice
 @Slf4j
@@ -30,10 +30,11 @@ public class ErrorHandler {
             NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponse> handleNotFoundException(Exception e) {
-        List<String> errors = Arrays.stream(e.getStackTrace())
-                .map(StackTraceElement::toString)
-                .collect(Collectors.toList());
-        ErrorResponse error = new ErrorResponse(errors, e.getMessage(), HttpStatus.NOT_FOUND);
+        log.error("404 {}", e.getMessage(), e);
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        String sStackTrace = sw.toString();
+        ErrorResponse error = new ErrorResponse(sStackTrace, e.getMessage(), HttpStatus.NOT_FOUND);
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
@@ -44,11 +45,11 @@ public class ErrorHandler {
             DuplicateKeyException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleValidationException(Exception e) {
-        log.info(e.getMessage());
-        List<String> errors = Arrays.stream(e.getStackTrace())
-                .map(StackTraceElement::toString)
-                .collect(Collectors.toList());
-        ErrorResponse error = new ErrorResponse(errors, e.getMessage(), HttpStatus.BAD_REQUEST);
+        log.error("400 {}", e.getMessage(), e);
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        String sStackTrace = sw.toString();
+        ErrorResponse error = new ErrorResponse(sStackTrace, e.getMessage(), HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
@@ -57,10 +58,11 @@ public class ErrorHandler {
             EmailNotUniqueException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<ErrorResponse> handleConflictException(Exception e) {
-        List<String> errors = Arrays.stream(e.getStackTrace())
-                .map(StackTraceElement::toString)
-                .collect(Collectors.toList());
-        ErrorResponse error = new ErrorResponse(errors, e.getMessage(), HttpStatus.CONFLICT);
+        log.error("409 {}", e.getMessage(), e);
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        String sStackTrace = sw.toString();
+        ErrorResponse error = new ErrorResponse(sStackTrace, e.getMessage(), HttpStatus.CONFLICT);
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 

@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 import static ru.practicum.ewm.event.EventCustomRepository.*;
+import static ru.practicum.ewm.event.EventState.CANCELED;
+import static ru.practicum.ewm.event.EventState.PENDING;
+import static ru.practicum.ewm.event.EventState.PUBLISHED;
 
 @Service
 @RequiredArgsConstructor
@@ -37,9 +40,10 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto saveEvent(long userId, NewEventDto newEventDto) {
-        User initiator = userRepository.findById(userId).orElseThrow(NotFoundException::new);
+        User initiator = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Not found initiator(user) with id = " + userId));
         EventCategory categoryInStorage = categoryRepository.findById(newEventDto.getCategory())
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(() -> new NotFoundException("Not found category with id = " + newEventDto.getCategory()));
         Event event = eventMapper.toModel(initiator, categoryInStorage, newEventDto);
         Event savedEvent = eventRepository.save(event);
         return eventMapper.toDto(savedEvent);
@@ -48,38 +52,17 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateEvent(long userId, NewEventDto newEventDto) {
-        final Event event = eventRepository.findById(newEventDto.getEventId()).orElseThrow(NotFoundException::new);
-        User requester = userRepository.findById(userId).orElseThrow(NotFoundException::new);
+        Event event = eventRepository.findById(newEventDto.getEventId())
+                .orElseThrow(() -> new NotFoundException("Not found event with id = " + newEventDto.getEventId()));
+        User requester = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Not found requester(user) with id = " + userId));
         if (!event.getInitiator().equals(requester)) {
             throw new NotAnInitiatorOfEventException("only initiator or admin can update event");
         }
-        if (event.getState() == EventState.PUBLISHED) {
+        if (event.getState() == PUBLISHED) {
             throw new InAppropriateStatusException("event is published already");
         }
-        if (newEventDto.getTitle() != null) {
-            event.setTitle(newEventDto.getTitle());
-        }
-        if (newEventDto.getAnnotation() != null) {
-            event.setAnnotation(newEventDto.getAnnotation());
-        }
-        if (newEventDto.getDescription() != null) {
-            event.setDescription(newEventDto.getDescription());
-        }
-        if (newEventDto.getCategory() != null) {
-            EventCategory category = categoryRepository.findById(newEventDto.getCategory())
-                    .orElseThrow(NotFoundException::new);
-            event.setCategory(category);
-        }
-        if (newEventDto.getEventDate() != null) {
-            event.setEventDate(newEventDto.getEventDate());
-        }
-        if (newEventDto.getPaid() != null) {
-            event.setPaid(newEventDto.getPaid());
-        }
-        if (newEventDto.getParticipantLimit() != null) {
-            event.setParticipantLimit(newEventDto.getParticipantLimit());
-        }
-
+        makeChangesToEntity(event, newEventDto);
         Event savedEvent = eventRepository.save(event);
         return eventMapper.toDto(savedEvent);
     }
@@ -93,8 +76,10 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getUserEvent(long userId, long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
-        User user = userRepository.findById(userId).orElseThrow(NotFoundException::new);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Not found event with id = " + eventId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Not found user with id = " + userId));
         if (!user.equals(event.getInitiator())) {
             throw new NotAnInitiatorOfEventException("it's not an user event");
         }
@@ -104,15 +89,17 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto deleteEventById(long userId, long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
-        User requester = userRepository.findById(userId).orElseThrow(NotFoundException::new);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Not found event with id = " + eventId));
+        User requester = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Not found requester(user) with id = " + userId));
         if (!event.getInitiator().equals(requester)) {
             throw new NotAnInitiatorOfEventException("only initiator or admin can cancel event");
         }
-        if (event.getState() != EventState.PENDING) {
+        if (event.getState() != PENDING) {
             throw new InAppropriateStatusException("not in PENDING state");
         }
-        event.setState(EventState.CANCELED);
+        event.setState(CANCELED);
         eventRepository.save(event);
         Event savedEvent = eventRepository.save(event);
         return eventMapper.toDto(savedEvent);
@@ -124,8 +111,9 @@ public class EventServiceImpl implements EventService {
 
         switch (sort) {
             case "EVENT_DATE":
-                List<Event> events = customRepository.findAll(where(hasText(text)).and(hasCategories(categories)).and(hasPaid(paid))
-                        .and(hasRangeStart(rangeStart)).and(hasRangeEnd(rangeEnd)).and(hasAvailable(onlyAvailable)));
+                List<Event> events = customRepository.findAll(where(hasText(text)).and(hasCategories(categories))
+                        .and(hasPaid(paid)).and(hasRangeStart(rangeStart)).and(hasRangeEnd(rangeEnd))
+                        .and(hasAvailable(onlyAvailable)));
                 return events.stream()
                         .sorted(Comparator.comparing(Event::getEventDate))
                         .map(eventMapper::toShortDto).collect(Collectors.toList());
@@ -147,13 +135,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getEventById(long eventId) {
-        Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED);
-        if (event != null) {
-            event.addViews();
-            return eventMapper.toDto(event);
-        } else {
-            return null;
-        }
+        Event event = eventRepository.findByIdAndState(eventId, PUBLISHED)
+                .orElseThrow(() -> new NotFoundException("Not found published event with id = " + eventId));
+        event.addViews();
+        eventRepository.save(event);
+        return eventMapper.toDto(event);
     }
 
     @Override
@@ -161,8 +147,8 @@ public class EventServiceImpl implements EventService {
                                         LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
         int page = from / size;
         if (users != null || states != null || categories != null || rangeStart != null || rangeEnd != null) {
-            List<Event> events = customRepository.findAll(where(hasUsers(users)).and(hasStates(states)).and(hasCategories(categories))
-                    .and(hasRangeStart(rangeStart)).and(hasRangeEnd(rangeEnd)));
+            List<Event> events = customRepository.findAll(where(hasUsers(users)).and(hasStates(states))
+                    .and(hasCategories(categories)).and(hasRangeStart(rangeStart)).and(hasRangeEnd(rangeEnd)));
             return events.stream()
                     .sorted(Comparator.comparing(Event::getId))
                     .map(eventMapper::toDto).collect(Collectors.toList());
@@ -175,8 +161,44 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateEventByAdmin(long eventId, NewEventDto newEventDto) {
-        final Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Not found event with id = " + eventId));
+        makeChangesToEntity(event, newEventDto);
+        if (newEventDto.getLocation() != null) {
+            event.setLocation(newEventDto.getLocation());
+        }
+        Event savedEvent = eventRepository.save(event);
+        return eventMapper.toDto(savedEvent);
+    }
 
+    @Override
+    @Transactional
+    public EventFullDto publishAnEvent(long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Not found event with id = " + eventId));
+        if (event.getState() != PENDING) {
+            throw new InAppropriateStatusException("Event must be in PENDING state for publishing");
+        }
+        event.setState(PUBLISHED);
+        event.setPublishedOn(LocalDateTime.now());
+        eventRepository.save(event);
+        return eventMapper.toDto(event);
+    }
+
+    @Override
+    @Transactional
+    public EventFullDto rejectEvent(long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Not found event with id = " + eventId));
+        if (event.getState() == PUBLISHED) {
+            throw new InAppropriateStatusException("event is published already");
+        }
+        event.setState(CANCELED);
+        eventRepository.save(event);
+        return eventMapper.toDto(event);
+    }
+
+    private void makeChangesToEntity(Event event, NewEventDto newEventDto) {
         if (newEventDto.getTitle() != null) {
             event.setTitle(newEventDto.getTitle());
         }
@@ -188,14 +210,11 @@ public class EventServiceImpl implements EventService {
         }
         if (newEventDto.getCategory() != null) {
             EventCategory category = categoryRepository.findById(newEventDto.getCategory())
-                    .orElseThrow(NotFoundException::new);
+                    .orElseThrow(() -> new NotFoundException("Not found category with id = " + newEventDto.getCategory()));
             event.setCategory(category);
         }
         if (newEventDto.getEventDate() != null) {
             event.setEventDate(newEventDto.getEventDate());
-        }
-        if (newEventDto.getLocation() != null) {
-            event.setLocation(newEventDto.getLocation());
         }
         if (newEventDto.getPaid() != null) {
             event.setPaid(newEventDto.getPaid());
@@ -203,33 +222,5 @@ public class EventServiceImpl implements EventService {
         if (newEventDto.getParticipantLimit() != null) {
             event.setParticipantLimit(newEventDto.getParticipantLimit());
         }
-
-        Event savedEvent = eventRepository.save(event);
-        return eventMapper.toDto(savedEvent);
-    }
-
-    @Override
-    @Transactional
-    public EventFullDto publishAnEvent(long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
-        if (event.getState() != EventState.PENDING) {
-            throw new InAppropriateStatusException("Event must be in PENDING state for publishing");
-        }
-        event.setState(EventState.PUBLISHED);
-        event.setPublishedOn(LocalDateTime.now());
-        eventRepository.save(event);
-        return eventMapper.toDto(event);
-    }
-
-    @Override
-    @Transactional
-    public EventFullDto rejectEvent(long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
-        if (event.getState() == EventState.PUBLISHED) {
-            throw new InAppropriateStatusException("event is published already");
-        }
-        event.setState(EventState.CANCELED);
-        eventRepository.save(event);
-        return eventMapper.toDto(event);
     }
 }

@@ -25,16 +25,19 @@ public class CompilationServiceImpl implements CompilationService {
     public List<CompilationDto> getCompilations(Boolean pinned, int from, int size) {
         int page = from / size;
         if (pinned != null) {
-            List<Compilation> allCompilations = compilationRepository.findAllByPinned(pinned, PageRequest.of(page, size));
-            return allCompilations.stream().map(compilationMapper::toDto).collect(Collectors.toList());
+            return compilationRepository.findAllByPinned(pinned, PageRequest.of(page, size)).stream()
+                    .map(compilationMapper::toDto)
+                    .collect(Collectors.toList());
         }
-        List<Compilation> allCompilations = compilationRepository.findAll(PageRequest.of(page, size));
-        return allCompilations.stream().map(compilationMapper::toDto).collect(Collectors.toList());
+        return compilationRepository.findAll(PageRequest.of(page, size)).stream()
+                .map(compilationMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public CompilationDto getCompilation(long compId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(NotFoundException::new);
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Not found compilation with id = " + compId));
         return compilationMapper.toDto(compilation);
     }
 
@@ -52,29 +55,35 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public void deleteCompilation(long compId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(NotFoundException::new);
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Not found compilation with id = " + compId));
         compilationRepository.delete(compilation);
     }
 
     @Override
     public void deleteEventFromCompilation(long compId, long eventId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(NotFoundException::new);
-        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Not found compilation with id = " + compId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Not found event with id = " + eventId));
         compilation.removeEvent(event);
         compilationRepository.save(compilation);
     }
 
     @Override
     public void addEventToCompilation(long compId, long eventId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(NotFoundException::new);
-        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Not found compilation with id = " + compId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Not found event with id = " + eventId));
         compilation.addEvent(event);
         compilationRepository.save(compilation);
     }
 
     @Override
     public void changePin(long compId, boolean isPinned) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(NotFoundException::new);
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Not found compilation with id = " + compId));
         compilation.setPinned(isPinned);
         compilationRepository.save(compilation);
     }
