@@ -24,6 +24,7 @@ public class AdminUserController {
                                    @RequestParam(name = "from", defaultValue = "0") int from,
                                    @RequestParam(name = "size", defaultValue = "10") int size) {
         log.debug("Total number of users: {}. Method: GET/findUsers in AdminUserController ", userService.findUsers(ids, from, size).size());
+
         return userService.findUsers(ids, from, size);
     }
 
@@ -32,6 +33,7 @@ public class AdminUserController {
     public UserDto registerUser(@RequestBody @Valid UserDto userDto) {
         UserDto userDtoSaved = userService.saveUser(userDto);
         log.debug("Number of added users: {}. Method: POST/registerUser in AdminUserController ", 1);
+
         return userDtoSaved;
     }
 

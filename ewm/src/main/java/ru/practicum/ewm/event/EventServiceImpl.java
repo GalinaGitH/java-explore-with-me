@@ -46,6 +46,7 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException("Not found category with id = " + newEventDto.getCategory()));
         Event event = eventMapper.toModel(initiator, categoryInStorage, newEventDto);
         Event savedEvent = eventRepository.save(event);
+
         return eventMapper.toDto(savedEvent);
     }
 
@@ -64,6 +65,7 @@ public class EventServiceImpl implements EventService {
         }
         makeChangesToEntity(event, newEventDto);
         Event savedEvent = eventRepository.save(event);
+
         return eventMapper.toDto(savedEvent);
     }
 
@@ -71,7 +73,10 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getEventsOfUser(long userId, int from, int size) {
         int page = from / size;
         List<Event> events = eventRepository.findEventsByInitiator_Id(userId, PageRequest.of(page, size));
-        return events.stream().map(eventMapper::toShortDto).collect(Collectors.toList());
+
+        return events.stream()
+                .map(eventMapper::toShortDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -83,6 +88,7 @@ public class EventServiceImpl implements EventService {
         if (!user.equals(event.getInitiator())) {
             throw new NotAnInitiatorOfEventException("it's not an user event");
         }
+
         return eventMapper.toDto(event);
     }
 
@@ -102,6 +108,7 @@ public class EventServiceImpl implements EventService {
         event.setState(CANCELED);
         eventRepository.save(event);
         Event savedEvent = eventRepository.save(event);
+
         return eventMapper.toDto(savedEvent);
     }
 
@@ -114,6 +121,7 @@ public class EventServiceImpl implements EventService {
                 List<Event> events = customRepository.findAll(where(hasText(text)).and(hasCategories(categories))
                         .and(hasPaid(paid)).and(hasRangeStart(rangeStart)).and(hasRangeEnd(rangeEnd))
                         .and(hasAvailable(onlyAvailable)));
+
                 return events.stream()
                         .sorted(Comparator.comparing(Event::getEventDate))
                         .map(eventMapper::toShortDto).collect(Collectors.toList());
@@ -121,12 +129,14 @@ public class EventServiceImpl implements EventService {
             case "VIEWS":
                 events = customRepository.findAll(where(hasText(text)).and(hasCategories(categories)).and(hasPaid(paid))
                         .and(hasRangeStart(rangeStart)).and(hasRangeEnd(rangeEnd)).and(hasAvailable(onlyAvailable)));
+
                 return events.stream()
                         .sorted(Comparator.comparing(Event::getViews))
                         .map(eventMapper::toShortDto).collect(Collectors.toList());
             default:
                 events = customRepository.findAll(where(hasText(text)).and(hasCategories(categories)).and(hasPaid(paid))
                         .and(hasRangeStart(rangeStart)).and(hasRangeEnd(rangeEnd)).and(hasAvailable(onlyAvailable)));
+
                 return events.stream()
                         .sorted(Comparator.comparing(Event::getId))
                         .map(eventMapper::toShortDto).collect(Collectors.toList());
@@ -139,6 +149,7 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException("Not found published event with id = " + eventId));
         event.addViews();
         eventRepository.save(event);
+
         return eventMapper.toDto(event);
     }
 
@@ -149,11 +160,13 @@ public class EventServiceImpl implements EventService {
         if (users != null || states != null || categories != null || rangeStart != null || rangeEnd != null) {
             List<Event> events = customRepository.findAll(where(hasUsers(users)).and(hasStates(states))
                     .and(hasCategories(categories)).and(hasRangeStart(rangeStart)).and(hasRangeEnd(rangeEnd)));
+
             return events.stream()
                     .sorted(Comparator.comparing(Event::getId))
                     .map(eventMapper::toDto).collect(Collectors.toList());
         } else {
             List<Event> events = eventRepository.findAllEvents(PageRequest.of(page, size));
+
             return events.stream().map(eventMapper::toDto).collect(Collectors.toList());
         }
     }
@@ -168,6 +181,7 @@ public class EventServiceImpl implements EventService {
             event.setLocation(newEventDto.getLocation());
         }
         Event savedEvent = eventRepository.save(event);
+
         return eventMapper.toDto(savedEvent);
     }
 
@@ -182,6 +196,7 @@ public class EventServiceImpl implements EventService {
         event.setState(PUBLISHED);
         event.setPublishedOn(LocalDateTime.now());
         eventRepository.save(event);
+
         return eventMapper.toDto(event);
     }
 
@@ -195,6 +210,7 @@ public class EventServiceImpl implements EventService {
         }
         event.setState(CANCELED);
         eventRepository.save(event);
+
         return eventMapper.toDto(event);
     }
 

@@ -27,6 +27,7 @@ public class UserController {
                                           @RequestParam(name = "from", defaultValue = "0") int from,
                                           @RequestParam(name = "size", defaultValue = "10") int size) {
         log.debug("Total number of events: {}. Method: GET/findEvents in UserController", eventService.getEventsOfUser(userId, from, size).size());
+
         return eventService.getEventsOfUser(userId, from, size);
     }
 
@@ -36,6 +37,7 @@ public class UserController {
                                     @RequestBody @Valid NewEventDto newEventDto) {
         EventFullDto eventDtoUpdated = eventService.updateEvent(userId, newEventDto);
         log.debug("Event updated, NewEventDto = {}. Method: PATCH/updateEvent in UserController", newEventDto);
+
         return eventDtoUpdated;
     }
 
@@ -44,6 +46,7 @@ public class UserController {
     public EventFullDto createEvent(@PathVariable("id") long userId, @RequestBody @Valid NewEventDto newEventDto) {
         EventFullDto eventDtoSaved = eventService.saveEvent(userId, newEventDto);
         log.debug("Create new event NewEventDto = {}, Method: POST/createEvent in UserController", newEventDto);
+
         return eventDtoSaved;
     }
 
@@ -52,6 +55,7 @@ public class UserController {
         log.info("Get user's event by userId = {}, eventId = {}. " +
                 "Method: GET/getEvent in UserController", userId, eventId);
         EventFullDto eventFullDto = eventService.getUserEvent(userId, eventId);
+
         return eventFullDto;
     }
 
@@ -60,6 +64,7 @@ public class UserController {
         EventFullDto eventFullDto = eventService.deleteEventById(userId, eventId);
         log.debug("User's event with userid = {} , eventId = {} - canceled. " +
                 "Method: PATCH/deleteEvent in UserController", userId, eventId);
+
         return eventFullDto;
     }
 

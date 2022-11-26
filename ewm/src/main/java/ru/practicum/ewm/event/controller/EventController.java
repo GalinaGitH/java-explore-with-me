@@ -42,6 +42,7 @@ public class EventController {
         statisticsClient.saveEndpointHit(request);
         log.info("Get List of events with the possibility of filtering. " +
                 "Method: GET/getAllEvents in EventController");
+
         return eventService.getAllEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort.name(), from, size);
     }
 
@@ -53,6 +54,7 @@ public class EventController {
                 "Method: GET/getEventById in EventController", eventId);
         EventFullDto eventFullDto = eventService.getEventById(eventId);
         statisticsClient.saveEndpointHit(request);
+
         return eventFullDto;
     }
 }

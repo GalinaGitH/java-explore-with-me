@@ -21,12 +21,14 @@ public class AdminCategoriesController {
     @PostMapping
     public CategoryDto addCategory(@RequestBody @Valid CategoryDto categoryDto) {
         log.info("Create new category. CategoryDto = {}", categoryDto);
+
         return categoryService.createCategory(categoryDto);
     }
 
     @PatchMapping
     public CategoryDto updateCategory(@RequestBody @Valid CategoryDto categoryDto) {
         log.info("Update category. CategoryDto = {}", categoryDto);
+
         return categoryService.updateCategory(categoryDto);
     }
 

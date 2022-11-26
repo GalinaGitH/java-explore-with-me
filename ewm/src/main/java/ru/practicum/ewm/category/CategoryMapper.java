@@ -14,7 +14,7 @@ public class CategoryMapper {
 
     public EventCategory toEventCategory(CategoryDto categoryDto) {
         return new EventCategory(
-                categoryDto.getId(),
+                null,
                 categoryDto.getName()
         );
     }

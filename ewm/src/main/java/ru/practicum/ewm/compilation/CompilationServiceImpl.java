@@ -38,18 +38,17 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto getCompilation(long compId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Not found compilation with id = " + compId));
+
         return compilationMapper.toDto(compilation);
     }
 
     @Override
     @Transactional
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
-        Compilation compilation = new Compilation(null, newCompilationDto.getTitle(), newCompilationDto.isPinned());
         List<Event> events = eventRepository.findEventsByIdIn(newCompilationDto.getEvents());
-        for (Event e : events) {
-            compilation.addEvent(e);
-        }
+        Compilation compilation = compilationMapper.toNewCompilation(newCompilationDto, events);
         Compilation savedCompilation = compilationRepository.save(compilation);
+
         return compilationMapper.toDto(savedCompilation);
     }
 

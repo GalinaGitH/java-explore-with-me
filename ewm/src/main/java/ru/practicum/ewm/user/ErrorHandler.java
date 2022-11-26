@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 import ru.practicum.ewm.event.exception.ConflictException;
-import ru.practicum.ewm.user.exception.EmailNotUniqueException;
 import ru.practicum.ewm.user.exception.ErrorResponse;
 import ru.practicum.ewm.user.exception.NotFoundException;
 
@@ -35,6 +34,7 @@ public class ErrorHandler {
         e.printStackTrace(new PrintWriter(sw));
         String sStackTrace = sw.toString();
         ErrorResponse error = new ErrorResponse(sStackTrace, e.getMessage(), HttpStatus.NOT_FOUND);
+
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
@@ -50,12 +50,12 @@ public class ErrorHandler {
         e.printStackTrace(new PrintWriter(sw));
         String sStackTrace = sw.toString();
         ErrorResponse error = new ErrorResponse(sStackTrace, e.getMessage(), HttpStatus.BAD_REQUEST);
+
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
     @ExceptionHandler({HttpClientErrorException.Conflict.class,
-            ConflictException.class,
-            EmailNotUniqueException.class})
+            ConflictException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<ErrorResponse> handleConflictException(Exception e) {
         log.error("409 {}", e.getMessage(), e);
@@ -63,6 +63,7 @@ public class ErrorHandler {
         e.printStackTrace(new PrintWriter(sw));
         String sStackTrace = sw.toString();
         ErrorResponse error = new ErrorResponse(sStackTrace, e.getMessage(), HttpStatus.CONFLICT);
+
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 

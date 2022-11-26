@@ -2,6 +2,8 @@ package ru.practicum.ewm.category;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.dto.CategoryDto;
@@ -21,7 +23,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> getCategories(int from, int size) {
-        List<EventCategory> categories = categoryRepository.findAll();
+        int page = from / size;
+        List<EventCategory> categories =
+                categoryRepository.findAll(PageRequest.of(page, size, Sort.Direction.ASC, "id")).getContent();
+
         return categories.stream()
                 .map(categoryMapper::toDto)
                 .collect(Collectors.toList());
@@ -31,6 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto getCategoryById(long catId) {
         final EventCategory eventCategory = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Not found category with id = " + catId));
+
         return categoryMapper.toDto(eventCategory);
     }
 
@@ -40,6 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
         EventCategory eventCategory = categoryMapper.toEventCategory(categoryDto);
         try {
             EventCategory savedCategory = categoryRepository.save(eventCategory);
+
             return categoryMapper.toDto(savedCategory);
         } catch (DataIntegrityViolationException | ConflictException ex) {
             throw new ConflictException(ex.getMessage());
@@ -56,6 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
         try {
             categoryRepository.saveAndFlush(categoryInStorage);
+
             return categoryMapper.toDto(categoryInStorage);
         } catch (DataIntegrityViolationException ex) {
             throw new ConflictException(ex.getMessage());

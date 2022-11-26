@@ -21,12 +21,14 @@ public class CompilationController {
                                                 @RequestParam(name = "from", defaultValue = "0") int from,
                                                 @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Get List of event's compilations. Method: GET/getCompilations in CompilationController");
+
         return compilationService.getCompilations(pinned, from, size);
     }
 
     @GetMapping("/{compId}")
     public CompilationDto getCompilation(@PathVariable("compId") long compId) {
         log.info("Get event's compilation by compId = {} .Method: GET/getCompilation in CompilationController", compId);
+
         return compilationService.getCompilation(compId);
     }
 

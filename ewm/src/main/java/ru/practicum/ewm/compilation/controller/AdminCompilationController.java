@@ -22,6 +22,7 @@ public class AdminCompilationController {
     public CompilationDto addCompilation(@RequestBody @Valid NewCompilationDto newCompilationDto) {
         log.info("Create new compilation by admin,NewCompilationDto = {} ", newCompilationDto);
         CompilationDto savedCompilationDto = compilationService.addCompilation(newCompilationDto);
+
         return savedCompilationDto;
     }
 
