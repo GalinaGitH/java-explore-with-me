@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode
 public class EndpointHitDto {
     @NotBlank
     private String app; //Название сервиса

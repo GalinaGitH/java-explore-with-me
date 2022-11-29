@@ -18,12 +18,12 @@ import java.time.LocalDateTime;
 
 @Service
 public class StatisticsClientImpl implements StatisticsClient {
-    @Value("ewn-main")
+    @Value("ewn-main-service")
     private final String app; //Название сервиса
     private final String url;//URI сервиса
     private final ObjectMapper objectMapper;
 
-    public StatisticsClientImpl(@Value("ewn-main") String app,
+    public StatisticsClientImpl(@Value("ewn-main-service") String app,
                                 @Value("${stats.url}")
                                 String url, ObjectMapper objectMapper) {
         this.app = app;
