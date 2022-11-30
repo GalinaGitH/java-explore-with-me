@@ -28,7 +28,7 @@ public class StatsController {
     public List<ViewStats> getStats(@RequestParam(name = "start") String start,
                                     @RequestParam(name = "end") String end,
                                     @RequestParam(name = "uris", required = false) List<String> uris,
-                                    @RequestParam(name = "unique", defaultValue = "false") boolean unique) {
+                                    @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
         log.info("Getting statistics on visits");
         return statsService.getStats(start, end, uris, unique);
     }
