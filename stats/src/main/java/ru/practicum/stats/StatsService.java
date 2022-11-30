@@ -16,5 +16,5 @@ public interface StatsService {
     /**
      * Получение статистики по посещениям
      */
-    List<ViewStats> getStats(String start, String end, List<String> uris, boolean unique);
+    List<ViewStats> getStats(String start, String end, List<String> uris, Boolean unique);
 }

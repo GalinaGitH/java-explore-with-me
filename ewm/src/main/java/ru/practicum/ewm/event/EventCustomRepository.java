@@ -23,7 +23,7 @@ public interface EventCustomRepository extends JpaRepository<Event, Long>, JpaSp
 
     static Specification<Event> hasCategories(List<Long> categories) {
         return (event, cq, cb) -> {
-            if (categories == null && categories.size() == 0) {
+            if (categories == null) {
                 return cb.isTrue(cb.literal(true));
             } else {
                 CriteriaBuilder.In<Long> categoriesIds = cb.in(event.get("category"));
@@ -37,7 +37,7 @@ public interface EventCustomRepository extends JpaRepository<Event, Long>, JpaSp
 
     static Specification<Event> hasPaid(Boolean paid) {
         return (event, cq, cb) -> {
-            if (paid == null && !paid) {
+            if (paid == null) {
                 return cb.isTrue(cb.literal(true));
             } else {
                 return cb.equal(event.get("paid"), paid);
